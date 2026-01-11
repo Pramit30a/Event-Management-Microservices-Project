@@ -1,0 +1,7 @@
+# React / Node
+Frontend/event-management-frontend/node_modules/
+Frontend/event-management-frontend/build/
+
+# Spring Boot
+Backend/.metadata/
+Backend/.sonarlint/

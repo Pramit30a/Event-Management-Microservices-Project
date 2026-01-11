@@ -1,0 +1,52 @@
+package com.example.demo.service;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import com.example.demo.entity.Event;
+import com.example.demo.exception.EventNotFoundException;
+import com.example.demo.feign.BookingClient;
+import com.example.demo.repository.EventRepo;
+
+@Service
+public class EventServiceImpl implements EventService {
+	
+	String message = "Event not present with id: ";
+
+	private EventRepo repo;
+	private BookingClient bookingClient;
+
+	public EventServiceImpl(EventRepo repo,BookingClient bookingClient) {
+		this.repo = repo;
+		this.bookingClient = bookingClient;
+	}
+
+	public void save(Event event) {
+		repo.save(event);
+	}
+
+	public List<Event> getAll() {
+		return repo.findAll();
+	}
+
+	public Event getById(Integer id) throws EventNotFoundException {
+		return repo.findById(id).orElseThrow(()->new EventNotFoundException(message + id));
+	}
+
+	public void update(Event event) throws EventNotFoundException {
+		if(!repo.existsById(event.getId())) {
+			throw new EventNotFoundException(message + event.getId());
+		}
+		repo.save(event);
+	}
+
+	public String delete(Integer id) throws EventNotFoundException {
+		if(!repo.existsById(id)) {
+			throw new EventNotFoundException(message + id);
+		}
+		repo.deleteById(id);
+        bookingClient.deleteBookingByEventId(id);
+        return "Event deleted successfully!!!";
+	}
+}
